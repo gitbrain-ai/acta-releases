@@ -6,8 +6,8 @@
 
 **Capture · Transcription · Document certifié — 100 % sur votre poste.**
 
-[⬇️ Télécharger la dernière version](https://github.com/gitbrain-ai/acta-releases/releases/latest) ·
-[Notes de version](https://github.com/gitbrain-ai/acta-releases/releases)
+[⬇️ Télécharger la dernière version](https://github.com/gitbrain-ai/voxacta/releases/latest) ·
+[Notes de version](https://github.com/gitbrain-ai/voxacta/releases)
 
 </div>
 
@@ -38,7 +38,7 @@ fonctionnent sur votre poste. Aucun cloud requis, aucune donnée transmise.
 ## Installation
 
 1. Téléchargez `VoxActa_x.y.z_x64-setup.exe` depuis la
-   [dernière release](https://github.com/gitbrain-ai/acta-releases/releases/latest)
+   [dernière release](https://github.com/gitbrain-ai/voxacta/releases/latest)
 2. Lancez l'installeur (Windows 10/11, 64 bits)
 3. Au premier démarrage, l'assistant configure l'environnement
    (modèles de transcription et d'IA locale) et active votre licence
