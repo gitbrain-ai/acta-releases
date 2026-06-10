@@ -13,7 +13,7 @@
 
 ---
 
-## Qu'est-ce qu'VoxActa ?
+## Qu'est-ce que VoxActa ?
 
 VoxActa enregistre vos auditions, consultations et réunions, les transcrit **mot à mot avec attribution des locuteurs**, puis produit le document de référence de votre métier — procès-verbal, compte rendu, note de synthèse — prêt à relire, sceller et signer.
 
