@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACTA Verify — vérification d'un dossier de preuve</title>
+<script src="https://unpkg.com/fflate@0.8.2/umd/index.js"></script>
+<style>
+  :root{--bg:#FAF8F4;--surface:#fff;--ink:#15131C;--ink2:#46434F;--muted:#7A7686;--line:#ECE7DE;
+    --accent:#4F46E5;--ok:#059669;--bad:#DC2626;--gold:#B8945A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:.04em}
+  .logo svg{flex:0 0 auto}
+  h1{font-size:26px;margin:18px 0 6px;text-align:center}
+  .sub{color:var(--muted);text-align:center;max-width:560px;line-height:1.55;font-size:14.5px}
+  .drop{margin:28px 0;width:min(680px,94vw);border:2px dashed var(--line);border-radius:18px;
+    background:var(--surface);padding:48px 24px;text-align:center;cursor:pointer;transition:.15s}
+  .drop:hover,.drop.over{border-color:var(--accent);background:#F6F5FF}
+  .drop b{color:var(--accent)}
+  .drop small{display:block;margin-top:8px;color:var(--muted)}
+  #file{display:none}
+  .card{width:min(680px,94vw);background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    padding:22px 26px;margin-bottom:16px;box-shadow:0 2px 10px rgba(20,18,28,.05)}
+  .verdict{display:flex;align-items:center;gap:12px;font-size:18px;font-weight:700;margin-bottom:6px}
+  .verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+  .meta{font-size:13px;color:var(--ink2);line-height:1.7}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;
+    padding:6px 8px;border-bottom:1px solid var(--line)}
+  td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  td.h{font-family:Consolas,monospace;font-size:11px;color:var(--muted);word-break:break-all}
+  .ok-i{color:var(--ok);font-weight:700} .bad-i{color:var(--bad);font-weight:700}
+  .audit{max-height:240px;overflow:auto;font-size:12.5px;line-height:1.7;margin-top:8px}
+  .audit div{border-bottom:1px dashed var(--line);padding:3px 0}
+  .audit .ts{font-family:Consolas,monospace;color:var(--muted);margin-right:8px;font-size:11px}
+  .note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.55}
+  footer{margin-top:auto;padding-top:32px;font-size:12px;color:var(--muted);text-align:center;line-height:1.6}
+  .hide{display:none}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--accent);
+    border-radius:50%;animation:r 1s linear infinite;vertical-align:-2px}
+  @keyframes r{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+  <div class="logo">
+    <svg width="34" height="34" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#4F46E5" stroke-width="5"/><g fill="#0E0F1A"><rect x="28" y="30" width="4" height="16" rx="2"/><rect x="38" y="23" width="4" height="30" rx="2"/><rect x="48" y="18" width="4" height="40" rx="2"/><rect x="58" y="24" width="4" height="28" rx="2"/><rect x="68" y="31" width="4" height="14" rx="2"/></g><g fill="#4F46E5"><rect x="30" y="64" width="40" height="3" rx="1.5"/><rect x="30" y="71" width="40" height="3" rx="1.5"/><rect x="30" y="78" width="26" height="3" rx="1.5"/></g></svg>
+    ACTA <span style="color:var(--accent)">Verify</span>
+  </div>
+  <h1>Vérifier un dossier de preuve</h1>
+  <p class="sub">Déposez un colis de preuve ACTA (<b>.zip</b>) : son intégrité est contrôlée
+  <b>entièrement dans votre navigateur</b> — aucun fichier n'est envoyé sur Internet.
+  Chaque pièce est re-hachée (SHA-256) et comparée au manifeste scellé dans le colis.</p>
+
+  <label class="drop" id="drop" for="file">
+    <b>Cliquez</b> ou glissez-déposez le fichier <b>preuve_….zip</b> ici
+    <small>Vérification 100 % locale (WebCrypto) — fonctionne hors connexion une fois la page chargée</small>
+  </label>
+  <input type="file" id="file" accept=".zip">
+
+  <div class="card hide" id="result">
+    <div class="verdict" id="verdict"></div>
+    <div class="meta" id="meta"></div>
+    <table id="table"><thead><tr><th>Pièce</th><th>SHA-256 attendu / calculé</th><th></th></tr></thead><tbody></tbody></table>
+    <p class="note">L'<b>authenticité</b> (qui a produit le document) est portée par la signature électronique
+    intégrée au PDF du colis — ouvrez-le dans Adobe Reader pour vérifier le signataire.
+    Cette page contrôle l'<b>intégrité</b> : aucune pièce n'a été modifiée depuis l'export.</p>
+  </div>
+
+  <div class="card hide" id="auditcard">
+    <b style="font-size:14px">Journal d'audit du dossier</b>
+    <div class="audit" id="audit"></div>
+  </div>
+
+  <footer>ACTA — La parole, transformée en document de référence.<br>
+  Vérificateur public v1 · le code de cette page est volontairement lisible (clic droit → afficher la source).</footer>
+
+<script>
+const drop = document.getElementById("drop");
+const input = document.getElementById("file");
+drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", e => {
+  e.preventDefault(); drop.classList.remove("over");
+  const f = e.dataTransfer.files[0]; if (f) verify(f);
+});
+input.addEventListener("change", () => { if (input.files[0]) verify(input.files[0]); });
+
+async function sha256(buf) {
+  const h = await crypto.subtle.digest("SHA-256", buf);
+  return [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function verify(file) {
+  const verdict = document.getElementById("verdict");
+  const result = document.getElementById("result");
+  const tbody = document.querySelector("#table tbody");
+  result.classList.remove("hide");
+  tbody.innerHTML = "";
+  verdict.className = "verdict";
+  verdict.innerHTML = '<span class="spin"></span> Vérification en cours…';
+  document.getElementById("meta").textContent = "";
+  document.getElementById("auditcard").classList.add("hide");
+
+  let entries;
+  try {
+    const data = new Uint8Array(await file.arrayBuffer());
+    entries = fflate.unzipSync(data);
+  } catch (e) {
+    verdict.className = "verdict bad";
+    verdict.textContent = "✕ Fichier illisible — est-ce bien un colis ACTA (.zip) ?";
+    return;
+  }
+  const manifestRaw = entries["manifest.json"];
+  if (!manifestRaw) {
+    verdict.className = "verdict bad";
+    verdict.textContent = "✕ Manifeste absent — ce colis n'est pas un dossier de preuve ACTA.";
+    return;
+  }
+  let manifest;
+  try { manifest = JSON.parse(new TextDecoder().decode(manifestRaw)); }
+  catch { verdict.className = "verdict bad"; verdict.textContent = "✕ Manifeste corrompu."; return; }
+
+  const s = manifest.session || {};
+  document.getElementById("meta").innerHTML =
+    (s.titre ? `<b>${esc(s.titre)}</b> · ` : "") + (s.date ? `${esc(s.date)} · ` : "") +
+    `colis généré le ${esc(manifest.generated_at || "?")} · ${(manifest.files || []).length} pièce(s)` +
+    (manifest.audio_included ? " · audio inclus" : " · sans audio");
+
+  let allOk = true, missing = 0;
+  for (const f of (manifest.files || [])) {
+    const tr = document.createElement("tr");
+    const data = entries[f.name];
+    let computed = "", ok = false;
+    if (data) { computed = await sha256(data); ok = computed === f.sha256; }
+    else { missing++; }
+    if (!ok) allOk = false;
+    tr.innerHTML = `<td>${esc(f.name)}</td>
+      <td class="h">${esc(f.sha256)}<br>${data ? esc(computed) : "<i>pièce absente du colis</i>"}</td>
+      <td class="${ok ? "ok-i" : "bad-i"}">${ok ? "✓" : "✕"}</td>`;
+    tbody.appendChild(tr);
+  }
+
+  verdict.className = "verdict " + (allOk ? "ok" : "bad");
+  verdict.textContent = allOk
+    ? "✓ Intégrité vérifiée — aucune pièce n'a été modifiée depuis l'export"
+    : (missing ? `✕ ${missing} pièce(s) manquante(s) ou altérée(s)` : "✕ Au moins une pièce a été MODIFIÉE depuis l'export");
+
+  const audit = manifest.audit || [];
+  if (audit.length) {
+    const ac = document.getElementById("auditcard");
+    const av = document.getElementById("audit");
+    av.innerHTML = audit.map(a =>
+      `<div><span class="ts">${esc(a.ts || "")}</span><b>${esc(a.action || "")}</b>` +
+      (a.author ? ` — ${esc(a.author)}` : "") + (a.detail ? ` · ${esc(a.detail)}` : "") + "</div>").join("");
+    ac.classList.remove("hide");
+  }
+}
+function esc(x) { const d = document.createElement("span"); d.textContent = String(x); return d.innerHTML; }
+</script>
+</body>
+</html>
