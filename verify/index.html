@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ACTA Verify — vérification d'un dossier de preuve</title>
+<title>VoxActa Verify — vérification d'un dossier de preuve</title>
 <script src="https://unpkg.com/fflate@0.8.2/umd/index.js"></script>
 <style>
   :root{--bg:#FAF8F4;--surface:#fff;--ink:#15131C;--ink2:#46434F;--muted:#7A7686;--line:#ECE7DE;
@@ -46,10 +46,10 @@
 <body>
   <div class="logo">
     <svg width="34" height="34" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#4F46E5" stroke-width="5"/><g fill="#0E0F1A"><rect x="28" y="30" width="4" height="16" rx="2"/><rect x="38" y="23" width="4" height="30" rx="2"/><rect x="48" y="18" width="4" height="40" rx="2"/><rect x="58" y="24" width="4" height="28" rx="2"/><rect x="68" y="31" width="4" height="14" rx="2"/></g><g fill="#4F46E5"><rect x="30" y="64" width="40" height="3" rx="1.5"/><rect x="30" y="71" width="40" height="3" rx="1.5"/><rect x="30" y="78" width="26" height="3" rx="1.5"/></g></svg>
-    ACTA <span style="color:var(--accent)">Verify</span>
+    VoxActa <span style="color:var(--accent)">Verify</span>
   </div>
   <h1>Vérifier un dossier de preuve</h1>
-  <p class="sub">Déposez un colis de preuve ACTA (<b>.zip</b>) : son intégrité est contrôlée
+  <p class="sub">Déposez un colis de preuve VoxActa (<b>.zip</b>) : son intégrité est contrôlée
   <b>entièrement dans votre navigateur</b> — aucun fichier n'est envoyé sur Internet.
   Chaque pièce est re-hachée (SHA-256) et comparée au manifeste scellé dans le colis.</p>
 
@@ -73,7 +73,7 @@
     <div class="audit" id="audit"></div>
   </div>
 
-  <footer>ACTA — La parole, transformée en document de référence.<br>
+  <footer>VoxActa — La parole, transformée en document de référence.<br>
   Vérificateur public v1 · le code de cette page est volontairement lisible (clic droit → afficher la source).</footer>
 
 <script>
@@ -109,13 +109,13 @@ async function verify(file) {
     entries = fflate.unzipSync(data);
   } catch (e) {
     verdict.className = "verdict bad";
-    verdict.textContent = "✕ Fichier illisible — est-ce bien un colis ACTA (.zip) ?";
+    verdict.textContent = "✕ Fichier illisible — est-ce bien un colis VoxActa (.zip) ?";
     return;
   }
   const manifestRaw = entries["manifest.json"];
   if (!manifestRaw) {
     verdict.className = "verdict bad";
-    verdict.textContent = "✕ Manifeste absent — ce colis n'est pas un dossier de preuve ACTA.";
+    verdict.textContent = "✕ Manifeste absent — ce colis n'est pas un dossier de preuve VoxActa.";
     return;
   }
   let manifest;

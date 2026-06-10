@@ -1,6 +1,6 @@
 <div align="center">
 
-# ACTA
+# VoxActa
 
 ### La parole, transformée en document de référence.
 
@@ -13,9 +13,9 @@
 
 ---
 
-## Qu'est-ce qu'ACTA ?
+## Qu'est-ce qu'VoxActa ?
 
-ACTA enregistre vos auditions, consultations et réunions, les transcrit **mot à mot avec attribution des locuteurs**, puis produit le document de référence de votre métier — procès-verbal, compte rendu, note de synthèse — prêt à relire, sceller et signer.
+VoxActa enregistre vos auditions, consultations et réunions, les transcrit **mot à mot avec attribution des locuteurs**, puis produit le document de référence de votre métier — procès-verbal, compte rendu, note de synthèse — prêt à relire, sceller et signer.
 
 | | |
 |---|---|
@@ -37,7 +37,7 @@ fonctionnent sur votre poste. Aucun cloud requis, aucune donnée transmise.
 
 ## Installation
 
-1. Téléchargez `ACTA_x.y.z_x64-setup.exe` depuis la
+1. Téléchargez `VoxActa_x.y.z_x64-setup.exe` depuis la
    [dernière release](https://github.com/gitbrain-ai/acta-releases/releases/latest)
 2. Lancez l'installeur (Windows 10/11, 64 bits)
 3. Au premier démarrage, l'assistant configure l'environnement
@@ -49,7 +49,7 @@ fonctionnent sur votre poste. Aucun cloud requis, aucune donnée transmise.
 
 ## Mises à jour
 
-ACTA vérifie ce dépôt à chaque démarrage. Quand une nouvelle version est
+VoxActa vérifie ce dépôt à chaque démarrage. Quand une nouvelle version est
 disponible, une bannière vous propose de **mettre à jour en un clic** —
 téléchargement, vérification de la signature et installation sont automatiques.
 Vos dossiers, documents et licence sont toujours préservés.
@@ -58,8 +58,8 @@ Chaque release publiée ici contient :
 
 | Fichier | Rôle |
 |---|---|
-| `ACTA_x.y.z_x64-setup.exe` | Installeur Windows (installation et mise à jour) |
-| `ACTA_x.y.z_x64-setup.exe.sig` | Signature minisign de l'installeur |
+| `VoxActa_x.y.z_x64-setup.exe` | Installeur Windows (installation et mise à jour) |
+| `VoxActa_x.y.z_x64-setup.exe.sig` | Signature minisign de l'installeur |
 | `latest.json` | Manifeste lu par l'auto-updater |
 
 L'application n'installe **que** des mises à jour dont la signature correspond
@@ -76,11 +76,11 @@ L'application n'installe **que** des mises à jour dont la signature correspond
 
 ## Licence & support
 
-ACTA est un logiciel commercial sous licence. Pour toute question, demande de
-licence ou support : contactez votre interlocuteur ACTA.
+VoxActa est un logiciel commercial sous licence. Pour toute question, demande de
+licence ou support : contactez votre interlocuteur VoxActa.
 
 ---
 
 <div align="center">
-<sub>© ACTA — Ce dépôt ne contient que les installeurs publiés. Le code source n'est pas public.</sub>
+<sub>© VoxActa — Ce dépôt ne contient que les installeurs publiés. Le code source n'est pas public.</sub>
 </div>
