@@ -77,6 +77,16 @@
   Vérificateur public v1 · le code de cette page est volontairement lisible (clic droit → afficher la source).</footer>
 
 <script>
+// Empreinte attendue passée par le QR code imprimé sur le document (#d=<sha256>)
+const expectedSha = (location.hash.match(/[#&]d=([0-9a-f]{64})/i) || [])[1]?.toLowerCase() || "";
+if (expectedSha) {
+  const b = document.createElement("div");
+  b.className = "card";
+  b.innerHTML = `<b>📱 Vérification depuis le QR d'un document</b>
+    <p class="meta" style="margin-top:6px">Empreinte attendue : <code style="font-size:11px;word-break:break-all">${expectedSha}</code><br>
+    Déposez le colis de preuve correspondant ci-dessous : la correspondance sera contrôlée automatiquement.</p>`;
+  document.getElementById("drop").before(b);
+}
 const drop = document.getElementById("drop");
 const input = document.getElementById("file");
 drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
@@ -128,7 +138,7 @@ async function verify(file) {
     `colis généré le ${esc(manifest.generated_at || "?")} · ${(manifest.files || []).length} pièce(s)` +
     (manifest.audio_included ? " · audio inclus" : " · sans audio");
 
-  let allOk = true, missing = 0;
+  let allOk = true, missing = 0, qrMatch = false;
   for (const f of (manifest.files || [])) {
     const tr = document.createElement("tr");
     const data = entries[f.name];
@@ -136,6 +146,7 @@ async function verify(file) {
     if (data) { computed = await sha256(data); ok = computed === f.sha256; }
     else { missing++; }
     if (!ok) allOk = false;
+    if (expectedSha && (computed === expectedSha || f.sha256 === expectedSha)) qrMatch = true;
     tr.innerHTML = `<td>${esc(f.name)}</td>
       <td class="h">${esc(f.sha256)}<br>${data ? esc(computed) : "<i>pièce absente du colis</i>"}</td>
       <td class="${ok ? "ok-i" : "bad-i"}">${ok ? "✓" : "✕"}</td>`;
@@ -146,6 +157,17 @@ async function verify(file) {
   verdict.textContent = allOk
     ? "✓ Intégrité vérifiée — aucune pièce n'a été modifiée depuis l'export"
     : (missing ? `✕ ${missing} pièce(s) manquante(s) ou altérée(s)` : "✕ Au moins une pièce a été MODIFIÉE depuis l'export");
+  if (expectedSha) {
+    if (!qrMatch && ((manifest.session||{}).wav_sha256_at_processing || "").toLowerCase() === expectedSha) qrMatch = true;
+    const q = document.createElement("p");
+    q.className = "note";
+    q.style.fontWeight = "600";
+    q.style.color = qrMatch ? "#059669" : "#B45309";
+    q.textContent = qrMatch
+      ? "✓ L'empreinte du QR code correspond à une pièce de ce colis."
+      : "⚠ L'empreinte du QR code ne correspond à aucune pièce de ce colis — vérifiez la provenance.";
+    verdict.after(q);
+  }
 
   const audit = manifest.audit || [];
   if (audit.length) {
